@@ -1,41 +1,64 @@
 package api
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
-	"log"
+
+	"github.com/angel-one/go-utils/log"
 )
 
 func SyncFundHouses(db *sql.DB) error {
-	res, err := getCMOTS("http://angelbrokingapi.cmots.com/api/Fund_House")
+	op := "SyncFundHouses"
+	ctx := context.Background()
+	log.Info(ctx).Msgf("job started %s", op)
+
+	res, err := GetCMOTS("http://angelbrokingapi.cmots.com/api/Fund_House")
 	if err != nil {
+		log.Error(ctx).Err(err).Msg("CMOTS Fund_House API is down")
 		return err
 	}
 
-	trunc_query := `truncate table fund_house`
+	insert_query := `insert into fund_house (mf_cocode,name)
+    select a.mf_cocode,a.name from fund_house_staging a
+    left join fund_house b
+    on a.mf_cocode=b.mf_cocode
+    where b.mf_cocode is null;`
+
+	update_query :=
+		`update fund_house 
+    set name = b.name,
+    url_logo = b.url_logo,
+    amc_info_url = b.amc_info_url,
+    updated_date_time = NOW()
+    from fund_house_staging b
+    where fund_house.mf_cocode = b.mf_cocode`
+
+	trunc_query := `TRUNCATE ONLY fund_house_staging RESTART IDENTITY; `
 	db.Exec(trunc_query)
 
-	query := `INSERT INTO fund_house (name,url_logo,amc_info_url,mf_cocode) VALUES ($1,$2,$3,$4)` //,$4
+	query := `INSERT INTO fund_house_staging (name,url_logo,amc_info_url,mf_cocode) VALUES ($1,$2,$3,$4)` //,$4
 	data := res["data"].([]any)
 	for _, fundHouse := range data {
 
 		fundHouse := fundHouse.(map[string]interface{})
-		name := fundHouse["nameamc"].(string)
+		name := fundHouse["LNAME"].(string)
 		mf_cocode := fundHouse["MF_COCODE"]
 		url_logo, amc_info_url, err1 := getLogo(fundHouse["MF_COCODE"].(float64))
 		if err1 != "" {
 			continue
-			//log.Printf("Failed to add fund house logo for %s: %v", name, err1)
-			//to be send to alert
 		}
-		_, err := db.Exec(query, name, url_logo, amc_info_url, mf_cocode) //, mf_cocode
+		_, err := db.Exec(query, name, url_logo, amc_info_url, mf_cocode)
 		if err != nil {
-			log.Printf("Failed to add fund house for %s: %v", name, err)
+			log.Error(ctx).Err(err).Msg("failed to insert record in fund_house_staging table")
 			continue
 		}
 		fmt.Println("added found house ", name)
 	}
 
+	db.Exec(insert_query)
+	db.Exec(update_query)
+	log.Info(ctx).Msgf("job ended %s", op)
 	return nil
 }
 
@@ -75,9 +98,6 @@ func getLogo(cocode float64) (string, string, string) {
 	logo_map[75267.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/trust_mutual_fund_angel.svg", ""}
 	logo_map[5431.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/tata_angel.svg", "https://www.tatamutualfund.com/downloads/"}
 	logo_map[73700.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/white_oak_angel.svg", ""}
-	// logo_map[] ={"NA",""}
-	// logo_map[] ={"NA",""}
-	// logo_map[] ={"NA",""}
 	logo_map[3583.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/icici_angel.svg", "https://www.icicipruamc.com/downloads"}
 	logo_map[14964.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/quant_angel.svg", "https://quantmutual.com/downloads/kim"}
 	logo_map[35448.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/axis_angel.svg", "https://www.axismf.com/downloads"}
