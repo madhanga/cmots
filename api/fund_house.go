@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/angel-one/go-utils/log"
 )
@@ -53,7 +52,7 @@ func SyncFundHouses(db *sql.DB) error {
 			log.Error(ctx).Err(err).Msg("failed to insert record in fund_house_staging table")
 			continue
 		}
-		fmt.Println("added found house ", name)
+		//fmt.Println("added found house ", name)
 	}
 
 	db.Exec(insert_query)
@@ -78,7 +77,7 @@ func getLogo(cocode float64) (string, string, string) {
 	logo_map[68409.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/mahindra_manulife_angel.svg", "https://www.licmf.com/sid-kim-sai"}
 	logo_map[39921.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/idbi_angel.svg", "https://www.idbimutual.co.in/Downloads/SID#"}
 	logo_map[6502.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/bnp_paribas_angel.svg", "https://www.barodabnpparibasmf.in/downloads"}
-	//logo_map[6502.0] ={"NA","https://www.barodabnpparibasmf.in/downloads"}
+	logo_map[17424.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/lic_angel.svg", "https://www.licmf.com/sid-kim-sai"}
 	logo_map[29865.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/boi_angel.svg", "https://www.boiaxamf.in/investor-corner#t7"}
 	logo_map[27488.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/invesco_angel.svg", "https://invescomutualfund.com/"}
 	logo_map[12180.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/jm_financial_angel.svg", "https://www.jmfinancialmf.com/Downloads/Addenda.aspx?SubReportID=538A8B27-62B1-4CFE-BFF2-65DDFF0D4627"}
@@ -103,16 +102,6 @@ func getLogo(cocode float64) (string, string, string) {
 	logo_map[35448.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/axis_angel.svg", "https://www.axismf.com/downloads"}
 	logo_map[19712.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/nippon_angel.svg", "https://mf.nipponindiaim.com/investor-service/downloads/scheme-information-document"}
 	logo_map[21273.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/hdfc_angel.svg", "https://www.hdfcfund.com/investor-desk/product-literature/sid"}
-	// logo_map[] ={"NA",""}
-	// logo_map[] ={"NA",""}
-	// logo_map[] ={"NA",""}
-	// logo_map[] ={"NA",""}
-	// logo_map[] ={"NA",""}
-	// logo_map[] ={"NA",""}
-	// logo_map[] ={"NA",""}
-	// logo_map[] ={"NA",""}
-	// logo_map[] ={"NA",""}
-	// logo_map[] ={"NA",""}
 	logo_map[6011.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/shriram_angel.svg", "https://www.shriramamc.in/DownloadsFundwise.aspx"}
 	logo_map[20327.0] = &[2]string{"https://d3usff6y6s0r8b.cloudfront.net/kotak_angel.svg", "https://www.kotakmf.com/Information/forms-and-downloads"}
 
