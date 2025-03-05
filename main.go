@@ -69,8 +69,7 @@ func syncFundHouses(db *sql.DB) error {
 }
 
 func getCMOTS(url string) (map[string]any, error) {
-	bearerToken := "Bearer FkLpiVedKizrjkML771_wJ-vEKMPKVKrNzZHSAe2yipPt8jDyssu-l8GOVh1UrZs8dI05kNT_Jyjf7-Hi9Q7QDLaod844f_wb31hxDtBpWcf3DekV1AsIGifKUJJePgRw8BzC-xg-7Vb0ylK8YbgY72JYYPNFp-Vqs6xqA0W0wsGo9ouu2CXf5MPHW7qLrMdpQjLGp6EZJIKVGNloAvjfnhKoajHqVoUiAUbpZJfM-o6epe-edbRRN5WxN2FuIVPoEA9v-Uh_LIK5k5p9wm5xx5cww72r1uc3SD3TSo2nosdhreIFCcyMxLGNzG-In0f"
-	req, err := http.NewRequest("GET", url, nil)
+	bearerToken := "Bearer <>"
 	if err != nil {
 		return nil, err
 	}
